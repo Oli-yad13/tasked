@@ -1,0 +1,554 @@
+'use client';
+import { useState, useEffect, useRef } from "react";
+import { motion, useAnimation } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+
+
+declare global {
+  interface Window {
+    UnicornStudio?: unknown; 
+  }
+}
+
+function NavBar() {
+  
+  useEffect(() => {
+    const interval = setInterval(() => {}, 2000);
+    return () => clearInterval(interval);
+  }, []);
+  return (
+    <nav className="fixed top-0 left-0 w-full z-50 bg-[#232323] text-white flex items-center justify-between px-6 py-4 border-b-2 border-black">
+      {/* Logo */}
+      <div className="flex items-center gap-2">
+        <Link href="/" className="relative w-32 h-20 flex items-center" style={{ overflow: 'visible' }}>
+          <Image
+            src="/tenadam-logo-small-Aq26gNbBBbuwxDq1.svg"
+            alt="Tenadam Logo"
+            width={32}
+            height={32}
+            priority
+            style={{
+              marginTop: '-1.2rem',
+              marginLeft: '-0.5rem',
+              height: '5rem',
+              width: 'auto',
+              objectFit: 'contain',
+              zIndex: 10,
+              pointerEvents: 'auto',
+            }}
+          />
+        </Link>
+      </div>
+    </nav>
+  );
+}
+
+// MarqueeText component for smooth, seamless looping
+function MarqueeText() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+  const controls = useAnimation();
+
+  useEffect(() => {
+    if (textRef.current) {
+      setWidth(textRef.current.offsetWidth);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (width === 0) return;
+    const animate = async () => {
+      while (true) {
+        await controls.start({ x: 0 });
+        await controls.start({ x: -width, transition: { duration: 32, ease: "linear" } });
+      }
+    };
+    animate();
+  }, [width, controls]);
+
+  const marqueeText = (
+    <div
+      ref={textRef}
+      className="text-6xl md:text-8xl font-black uppercase text-[#A31621] whitespace-nowrap px-8 tracking-tight"
+      style={{ letterSpacing: "-0.04em" }}
+    >
+      Tenadam Training, Consultancy and Research PLC &nbsp; • &nbsp; Tenadam Training, Consultancy and Research PLC &nbsp; • &nbsp; Tenadam Training, Consultancy and Research PLC &nbsp; • &nbsp; Tenadam Training, Consultancy and Research PLC
+    </div>
+  );
+
+  return (
+    <div className="absolute bottom-8 left-0 w-full z-20 overflow-hidden">
+      <motion.div
+        className="flex relative z-10"
+        ref={containerRef}
+        animate={controls}
+        initial={{ x: 0 }}
+        style={{ willChange: "transform" }}
+      >
+        {marqueeText}
+        {marqueeText}
+      </motion.div>
+    </div>
+  );
+}
+
+// AppMockup component
+interface AppMockupProps {
+  mainImg: string;
+  extraImgs: string[]; // Should be 4 extra images for a total of 5
+  bgColor: string;
+  borderColor: string;
+  title: string;
+  desc: string;
+  mt?: string;
+}
+function AppMockup({ mainImg, extraImgs, bgColor, borderColor, title, desc, mt = '' }: AppMockupProps) {
+  const [hovered, setHovered] = useState(false);
+  // All images: main + 4 extra
+  const allImgs = [mainImg, ...extraImgs];
+  return (
+    <div
+      className={`flex flex-col md:flex-row items-center md:items-start gap-8 transition-all duration-300 ${mt}`}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{ minHeight: 200 }}
+    >
+      <div className="relative flex items-center justify-center w-full" style={{ minWidth: 80, minHeight: 180 }}>
+        {/* 5 screens: main always full, others fanned out behind, all expand on hover */}
+        <motion.div
+          className="flex items-center justify-center w-full"
+          animate={hovered ? { gap: 24 } : { gap: 0 }}
+          style={{ width: '100%' }}
+        >
+          {allImgs.map((img, idx) => (
+            <motion.div
+              key={idx}
+              initial={false}
+              animate={hovered ? {
+                width: 160,
+                height: 320,
+                marginLeft: idx === 0 ? 0 : 16,
+                marginRight: idx === allImgs.length - 1 ? 0 : 16,
+                scale: 1.05,
+                opacity: 1,
+                zIndex: 20,
+                boxShadow: '0 16px 48px 0 rgba(0,0,0,0.18)'
+              } : idx === 2 ? {
+                width: 200,
+                height: 400,
+                marginLeft: 0,
+                marginRight: 0,
+                scale: 1,
+                opacity: 1,
+                zIndex: 30,
+                boxShadow: '0 16px 48px 0 rgba(0,0,0,0.18)'
+              } : {
+                width: 100,
+                height: 200,
+                marginLeft: idx < 2 ? -40 * (2 - idx) : 0,
+                marginRight: idx > 2 ? -40 * (idx - 2) : 0,
+                scale: 0.85,
+                opacity: 0.5,
+                zIndex: 10,
+                boxShadow: '0 4px 16px 0 rgba(0,0,0,0.10)'
+              }}
+              transition={{ type: 'spring', stiffness: 200, damping: 30 }}
+              className={`${bgColor} ${borderColor} border-4 shadow-2xl rounded-[2rem] overflow-hidden relative flex-shrink-0 flex-grow-0`}
+              style={{ minWidth: 0, minHeight: 0 }}
+            >
+              <Image src={img} alt={title + ' screen ' + (idx + 1)} width={200} height={400} className="object-cover w-full h-full rounded-[2rem]" />
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+      <div className="flex-1 flex flex-col justify-center">
+        <h4 className="text-2xl font-black text-black mb-2">{title}</h4>
+        <p className="text-lg text-black/80">{desc}</p>
+      </div>
+    </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <main className="bg-[#FCF7F8] min-h-screen">
+      <NavBar />
+      {/* Animated Hero Section */}
+      <section className="relative w-full h-[70vh] overflow-hidden flex items-center justify-center bg-[#FCF7F8]">
+        {/* More prominent animated background shapes */}
+        <motion.div
+          className="absolute inset-0 z-0 flex items-center justify-center"
+          initial={{}}
+          animate={{}}
+        >
+          <motion.div
+            className="w-[80vw] h-[80vw] bg-[#A31621] rounded-full blur-3xl opacity-50 absolute -left-40 -top-40"
+            animate={{ scale: [1, 1.15, 1], x: [0, 40, 0], y: [0, -40, 0] }}
+            transition={{ repeat: Infinity, duration: 10, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="w-[70vw] h-[70vw] bg-[#A31621] rounded-full blur-3xl opacity-40 absolute -right-40 -bottom-40"
+            animate={{ scale: [1, 1.1, 1], x: [0, -40, 0], y: [0, 40, 0] }}
+            transition={{ repeat: Infinity, duration: 12, ease: "easeInOut" }}
+          />
+        </motion.div>
+        {/* Infinite seamless marquee sliding text at the bottom */}
+        <MarqueeText />
+      </section>
+
+      {/* Our Featured Work Section (full-screen, punchy, left-aligned, seamless) */}
+      <section className="w-full min-h-screen bg-[#F6F6ED] flex flex-col pt-24">
+        {/* Top Bar */}
+        <div className="w-full flex justify-between items-center px-12 pt-8 pb-4 text-xs font-mono text-black/80 tracking-widest">
+          <span>EST. 2023</span>
+          <span>( SCROLL DOWN )</span>
+          <span>WE LIVE IN THE DETAILS ( C )</span>
+        </div>
+        {/* Section Title */}
+        <div className="w-full flex flex-col items-start pl-12 mt-4 mb-4">
+          <h2 className="text-5xl md:text-7xl font-light text-black flex items-end gap-4">
+            <span>Our</span>
+            <span className="italic font-serif font-bold">featured</span>
+            <span className="font-black">Work</span>
+          </h2>
+          <div className="uppercase text-xs md:text-base tracking-widest text-black/60 mt-2">
+            GIVING STARTUPS THE UNFAIR ADVANTAGE
+          </div>
+        </div>
+        {/* Gallery Container for equal side gaps */}
+        <div className="w-full px-4 md:px-8 flex flex-col gap-8">
+          {/* Big Hero Gallery Card (top, full-width, now below heading) */}
+          <div className="border-8 border-[#171717] rounded-3xl bg-[#232323] overflow-hidden shadow-2xl mb-4 mt-2 w-full h-screen flex flex-col">
+            <div className="flex-1 bg-gray-200 flex items-center justify-center overflow-hidden">
+              {/* Embedded IRIF site preview */}
+              <a
+                href="https://www.irif.et/"
+            target="_blank"
+            rel="noopener noreferrer"
+                className="w-full h-full block"
+              >
+                <iframe
+                  src="https://www.irif.et/"
+                  title="IRIF (እርፍ)"
+                  className="w-full h-full border-0"
+                  style={{ minHeight: '100%', minWidth: '100%', background: '#fff' }}
+                  allowFullScreen
+                />
+              </a>
+            </div>
+            <div className="p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-[#232323]">
+              <div>
+                <span className="text-white text-xl font-black uppercase">IRIF (እርፍ)</span>
+                <span className="text-white/80 text-base ml-4">Experience the IRIF intelligent farming solution</span>
+              </div>
+              <div className="flex flex-wrap gap-2 items-center">
+                <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Smart Farming</span>
+                <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">IoT</span>
+                <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Satellite Data</span>
+                <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">AI</span>
+                <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Climate Resilience</span>
+                <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Agriculture</span>
+                <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Ethiopia</span>
+              </div>
+            </div>
+          </div>
+          {/* Two big gallery frames side by side (middle, very tall) */}
+          <div className="w-full flex flex-col md:flex-row gap-8">
+            {/* First card (Runway, very tall) */}
+            <div className="flex-[1_1_48%] border-8 border-[#171717] rounded-3xl bg-[#232323] overflow-hidden shadow-2xl">
+              <div className="w-full h-[64rem] bg-gray-200 flex items-center justify-center overflow-hidden">
+                {/* Embedded IDNET site preview */}
+                <a
+                  href="https://idnet.et/"
+            target="_blank"
+            rel="noopener noreferrer"
+                  className="w-full h-full block"
+                >
+                  <iframe
+                    src="https://idnet.et/"
+                    title="IDNET"
+                    className="w-full h-full border-0"
+                    style={{ minHeight: '100%', minWidth: '100%', background: '#fff' }}
+                    allowFullScreen
+                  />
+          </a>
+        </div>
+              <div className="p-6 flex flex-col gap-2 bg-[#232323]">
+                <div>
+                  <span className="text-white text-xl font-black uppercase">IDNET</span>
+                  <span className="text-white/80 text-base ml-4">Digital Identity Solutions for Ethiopia</span>
+                </div>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Digital Identity</span>
+                  <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Ethiopia</span>
+                  <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Technology</span>
+                  <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Security</span>
+                  <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Platform</span>
+                </div>
+              </div>
+            </div>
+            {/* Second card (Campfire, very tall) */}
+            <div className="flex-[1_1_52%] border-8 border-[#171717] rounded-3xl bg-[#232323] overflow-hidden shadow-2xl">
+              <div className="w-full h-[64rem] bg-gray-200 flex items-center justify-center overflow-hidden">
+                {/* Embedded HuluCares site preview */}
+                <a
+                  href="https://www.hulucares.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+                  className="w-full h-full block"
+                >
+                  <iframe
+                    src="https://www.hulucares.com/"
+                    title="HuluCares"
+                    className="w-full h-full border-0"
+                    style={{ minHeight: '100%', minWidth: '100%', background: '#fff' }}
+                    allowFullScreen
+                  />
+                </a>
+              </div>
+              <div className="p-6 flex flex-col gap-2 bg-[#232323]">
+                <div>
+                  <span className="text-white text-xl font-black uppercase">HuluCares</span>
+                  <span className="text-white/80 text-base ml-4">Revolutionizing Healthcare in Ethiopia</span>
+                </div>
+                <div className="flex flex-wrap gap-2 items-center">
+                  <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Healthcare</span>
+                  <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Blockchain</span>
+                  <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Insurance</span>
+                  <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Tech-Enabled</span>
+                  <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Telemedicine</span>
+                  <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Ethiopia</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* Next row: two shorter, asymmetric cards */}
+          <div className="w-full flex flex-col md:flex-row gap-8">
+            {/* Left card (Aerodome, wide) */}
+            <div className="flex-[1_1_65%] border-8 border-[#171717] rounded-3xl bg-[#232323] overflow-hidden shadow-2xl">
+              <div className="w-full h-[44rem] bg-gray-200 flex items-center justify-center overflow-hidden">
+                {/* Embedded Growup site preview */}
+                <a
+                  href="https://growup.et/"
+          target="_blank"
+          rel="noopener noreferrer"
+                  className="w-full h-full block"
+                >
+                  <iframe
+                    src="https://growup.et/"
+                    title="Growup"
+                    className="w-full h-full border-0"
+                    style={{ minHeight: '100%', minWidth: '100%', background: '#fff' }}
+                    allowFullScreen
+                  />
+                </a>
+              </div>
+              <div className="p-6 flex flex-col gap-2 bg-[#232323]">
+                <div>
+                  <span className="text-white text-xl font-black uppercase">Growup</span>
+                  <span className="text-white/80 text-base ml-4">Helping Ethiopian Startups to Grow</span>
+                </div>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Startup Support</span>
+                  <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Funding</span>
+                  <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Legal Setup</span>
+                  <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Compliance</span>
+                  <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Financial Planning</span>
+                  <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Ethiopia</span>
+                </div>
+              </div>
+            </div>
+            {/* Right card (Journey, narrow) */}
+            <div className="flex-[1_1_35%] border-8 border-[#171717] rounded-3xl bg-[#232323] overflow-hidden shadow-2xl">
+              <div className="w-full h-[44rem] bg-gray-200 flex items-center justify-center overflow-hidden">
+                {/* Embedded Lanchi site preview */}
+                <a
+                  href="https://lanchi.et/"
+          target="_blank"
+          rel="noopener noreferrer"
+                  className="w-full h-full block"
+                >
+                  <iframe
+                    src="https://lanchi.et/"
+                    title="Lanchi"
+                    className="w-full h-full border-0"
+                    style={{ minHeight: '100%', minWidth: '100%', background: '#fff' }}
+                    allowFullScreen
+                  />
+                </a>
+              </div>
+              <div className="p-6 flex flex-col gap-2 bg-[#232323]">
+                <div>
+                  <span className="text-white text-xl font-black uppercase">Lanchi</span>
+                  <span className="text-white/80 text-base ml-4">Empowering Ethiopias Digital Future</span>
+                </div>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Digital Platform</span>
+                  <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Innovation</span>
+                  <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Technology</span>
+                  <span className="bg-[#232323] border border-white text-white px-4 py-1 rounded-full text-xs font-bold">Ethiopia</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* App Mockups Section for 4 Apps with Hover Expand */}
+          <section className="w-full py-24 flex flex-col items-center justify-center" style={{ background: 'linear-gradient(180deg, #f6fafd 0%, #eaf1fa 100%)' }}>
+            <h3 className="text-3xl md:text-5xl font-black text-black mb-16 uppercase tracking-tight text-center">App Mockups</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-20 gap-x-16 w-full max-w-6xl">
+              {/* App 1: Lanchi */}
+              <AppMockup
+                mainImg="/lanchi1.png"
+                extraImgs={["/lanchi2.png", "/lanchi3.png", "/lanchi4.png", "/lanchi5.png"]}
+                bgColor="bg-black"
+                borderColor="border-[#171717]"
+                title="Lanchi"
+                desc="Empowering Ethiopia's Digital Future."
+              />
+              {/* App 2: Keteme */}
+              <AppMockup
+                mainImg="/keteme1.png"
+                extraImgs={["/keteme2.png", "/keteme3.png", "/keteme4.png", "/keteme5.png"]}
+                bgColor="bg-[#e94f4f]"
+                borderColor="border-[#171717]"
+                title="Keteme"
+                desc="Ethiopia's First Rent-to-Own Furniture Platform."
+                mt="mt-12 md:mt-32"
+              />
+              {/* App 3: Tena Sabi */}
+              <AppMockup
+                mainImg="/tenasabi1.png"
+                extraImgs={["/tenasabi2.png", "/tenasabi3.png", "/tenasabi4.png", "/tenasabi5.png"]}
+                bgColor="bg-[#232323]"
+                borderColor="border-[#171717]"
+                title="Tena Sabi"
+                desc="Your Digital Health Companion."
+              />
+              {/* App 4: IDNET */}
+              <AppMockup
+                mainImg="/idnet1.png"
+                extraImgs={["/idnet2.png", "/idnet3.png", "/idnet4.png", "/idnet5.png"]}
+                bgColor="bg-[#f7b731]"
+                borderColor="border-[#171717]"
+                title="IDNET"
+                desc="Digital Identity Solutions for Ethiopia."
+                mt="mt-12 md:mt-32"
+              />
+            </div>
+          </section>
+        </div>
+      </section>
+
+      {/* Call to Action Section: See All Work */}
+      <section className="w-full bg-[#F6F6ED] py-24 flex flex-col items-center justify-center">
+        <div className="w-full flex flex-col md:flex-row items-center justify-center gap-8 md:gap-0">
+          <div className="flex-1 flex justify-center md:justify-end min-w-0">
+            <span className="text-3xl md:text-6xl font-serif text-black whitespace-nowrap">We do many</span>
+          </div>
+          <div className="flex-1 flex justify-center my-8 md:my-0 min-w-0">
+            <a
+              href="/gallery"
+              className="bg-black text-white text-lg md:text-2xl font-extrabold rounded-full px-8 md:px-16 py-6 md:py-10 flex items-center justify-center shadow-lg hover:bg-[#232323] transition-all duration-200 border-8 border-black min-w-0 w-full max-w-[420px] min-h-[80px] md:min-h-[170px]"
+              style={{ letterSpacing: '0.01em' }}
+            >
+              SEE ALL WORK
+              <span className="ml-4 text-2xl md:text-3xl transition-transform duration-200 group-hover:translate-x-2 group-hover:rotate-12">↗</span>
+            </a>
+          </div>
+          <div className="flex-1 flex justify-center md:justify-start min-w-0">
+            <span className="text-3xl md:text-6xl font-serif text-black whitespace-nowrap">things very well.</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Selected Clients Section */}
+      <section className="w-full bg-[#F6F6ED] py-24 flex flex-col items-center justify-center">
+        <div className="max-w-7xl w-full mx-auto flex flex-col md:flex-row gap-12 md:gap-0 items-start md:items-center">
+          <div className="w-full md:w-1/5 flex flex-col items-start justify-center pl-4 md:pl-0 mb-8 md:mb-0">
+            <span className="font-black text-lg md:text-xl uppercase leading-tight tracking-tight text-black">SELECTED<br />CLIENTS</span>
+          </div>
+          <div className="w-full md:w-4/5 grid grid-cols-2 md:grid-cols-5 gap-y-12 gap-x-8 md:gap-x-16 items-center justify-items-center">
+            <Image src="/logos/aalc-logo-AQE841DJ3zSL2pP5.svg" alt="Advanced Attorneys & Legal Consultants" width={120} height={80} className="h-16 md:h-20 max-w-[120px] object-contain" />
+            <Image src="/logos/cbga-logo-YyvPO3eO03fNB5yv.avif" alt="CBGA" width={120} height={80} className="h-16 md:h-20 max-w-[120px] object-contain" />
+            <Image src="/logos/csoet-powered-by-csankofa-Yyv3bgP3G0CyynJ5.avif" alt="CSO.et" width={120} height={80} className="h-16 md:h-20 max-w-[120px] object-contain" />
+            <Image src="/logos/et-star-logo-2-YX41zZkjPwH6WX3X.avif" alt="ET Star IT Solutions" width={120} height={80} className="h-16 md:h-20 max-w-[120px] object-contain" />
+            <Image src="/logos/Group 33.svg" alt="Birrama" width={120} height={80} className="h-16 md:h-20 max-w-[120px] object-contain" />
+            <Image src="/logos/Group 42.png" alt="Tele Medhin" width={120} height={80} className="h-16 md:h-20 max-w-[120px] object-contain" />
+            <Image src="/logos/Growup-logo.webp" alt="Growup" width={120} height={80} className="h-16 md:h-20 max-w-[120px] object-contain" />
+            <Image src="/logos/hulucares logo.svg" alt="HuluCares" width={120} height={80} className="h-16 md:h-20 max-w-[120px] object-contain" />
+            <Image src="/logos/IDNET GREEN.png" alt="IDNET" width={120} height={80} className="h-16 md:h-20 max-w-[120px] object-contain" />
+            <Image src="/logos/irif logo.png" alt="IRIF" width={120} height={80} className="h-16 md:h-20 max-w-[120px] object-contain" />
+            <Image src="/logos/keteme logo 2.svg" alt="Keteme" width={120} height={80} className="h-16 md:h-20 max-w-[120px] object-contain" />
+            <Image src="/logos/lanchi logo 1.png" alt="Lanchi" width={120} height={80} className="h-16 md:h-20 max-w-[120px] object-contain" />
+            <Image src="/logos/logos1.png" alt="Client Logo 1" width={120} height={80} className="h-16 md:h-20 max-w-[120px] object-contain" />
+            <Image src="/logos/logo-yhre-m7VpRlVayoU7o52q.png" alt="YHRE" width={120} height={80} className="h-16 md:h-20 max-w-[120px] object-contain" />
+            <Image src="/logos/Tena sabi logo.png" alt="Tena Sabi" width={120} height={80} className="h-16 md:h-20 max-w-[120px] object-contain" />
+            <Image src="/logos/logo.png" alt="Logo" width={120} height={80} className="h-16 md:h-20 max-w-[120px] object-contain" />
+          </div>
+        </div>
+      </section>
+
+      {/* Your Story Section (About Us) */}
+      <section className="w-full bg-[#F6F6ED] py-32 flex flex-col items-center justify-center">
+        <div className="max-w-6xl w-full mx-auto flex flex-col items-center">
+          <div className="w-full flex flex-col md:flex-row items-center justify-center mb-12">
+            <h2 className="text-4xl md:text-6xl font-serif text-black text-center md:text-left font-light">
+              <span>Your story has a future.</span>
+              <span className="mx-4">&larr;</span>
+              <span>We design and build to tell it.</span>
+            </h2>
+          </div>
+          <div className="w-full flex flex-col md:flex-row gap-12 mb-12">
+            <div className="flex-1 text-lg md:text-xl text-black font-normal leading-relaxed">
+              Not just a pitch, not just a product...there&apos;s a reason you do what you do. It&apos;s the late nights, the wild ideas, the belief that this thing you&apos;re building actually matters. That&apos;s the story people will connect with. That&apos;s the story worth telling. It&apos;s the story we can craft for you.
+            </div>
+            <div className="flex-1 text-lg md:text-xl text-black font-normal leading-relaxed">
+              A great story deserves more than a place to live. A story needs a way to move. We design brands, craft interfaces, and build digital experiences that don&apos;t just inform but pull people in. Every detail, every interaction, every pixel works to make your story impossible to ignore.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Our Team Section */}
+      <section className="w-full bg-[#F6F6ED] py-24 flex flex-col items-center justify-center">
+        <div className="max-w-6xl w-full mx-auto flex flex-col items-center">
+          <h2 className="text-4xl md:text-5xl font-serif text-black font-light mb-12">Our Team</h2>
+          <div className="w-full flex justify-center">
+            <Image src="/teams.png" alt="Our Team" width={1200} height={400} className="w-full max-w-4xl rounded-3xl shadow-xl object-cover" />
+          </div>
+        </div>
+      </section>
+
+      {/* Footer Section */}
+      <footer className="w-full bg-[#F6F6ED] pt-24 pb-8 flex flex-col items-center justify-center border-t border-black/10">
+        <div className="max-w-7xl w-full mx-auto flex flex-col md:flex-row items-start md:items-center justify-between mb-12 px-4 md:px-0">
+          <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-start gap-12">
+            {/* Address */}
+            <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left">
+              <span className="text-xl md:text-2xl font-bold mb-2">OUR ADDRESS</span>
+              <span className="text-lg md:text-xl">Lem-Hotel Area, Addis<br />Ababa</span>
+            </div>
+            {/* Contact */}
+            <div className="flex-1 flex flex-col items-center text-center">
+              <span className="text-xl md:text-2xl font-bold mb-2">CONTACT US</span>
+              <a href="mailto:info@tenadamconsulting.com" className="underline text-lg md:text-xl mb-1">info@tenadamconsulting.com</a>
+              <span className="text-lg md:text-xl">+251-911-58-4260</span>
+              <span className="text-lg md:text-xl">+251-912-44-2502</span>
+              <span className="text-lg md:text-xl">+251-993-51-8990</span>
+            </div>
+            {/* Working Hours */}
+            <div className="flex-1 flex flex-col items-center md:items-end text-center md:text-right">
+              <span className="text-xl md:text-2xl font-bold mb-2">WORKING HOURS</span>
+              <span className="text-lg md:text-xl">Monday – Friday<br />8:30 AM – 5:30 PM</span>
+            </div>
+          </div>
+        </div>
+        {/* Bottom: Huge Company Name */}
+        <div className="w-full text-center">
+          <span className="text-[10vw] md:text-[7vw] font-black uppercase text-black leading-none tracking-tight block">TENADAM<span className="align-super text-3xl md:text-5xl">©</span></span>
+        </div>
+      </footer>
+    </main>
+  );
+}
