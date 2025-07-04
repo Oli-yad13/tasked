@@ -176,7 +176,7 @@ export default function Home() {
     <main className="bg-[#FCF7F8] min-h-screen">
       <NavBar />
       {/* Animated Hero Section */}
-      <section className="relative w-full h-[70vh] overflow-hidden flex items-center justify-center bg-[#FCF7F8]">
+      <section className="relative w-full h-[40vh] overflow-hidden flex items-center justify-center bg-[#FCF7F8]">
         {/* More prominent animated background shapes */}
         <motion.div
           className="absolute inset-0 z-0 flex items-center justify-center"
@@ -393,50 +393,6 @@ export default function Home() {
               </div>
             </div>
           </div>
-          {/* App Mockups Section for 4 Apps with Hover Expand */}
-          <section className="w-full py-24 flex flex-col items-center justify-center" style={{ background: 'linear-gradient(180deg, #f6fafd 0%, #eaf1fa 100%)' }}>
-            <h3 className="text-3xl md:text-5xl font-black text-black mb-16 uppercase tracking-tight text-center">App Mockups</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-20 gap-x-16 w-full max-w-6xl">
-              {/* App 1: Lanchi */}
-              <AppMockup
-                mainImg="/lanchi1.png"
-                extraImgs={["/lanchi2.png", "/lanchi3.png", "/lanchi4.png", "/lanchi5.png"]}
-                bgColor="bg-black"
-                borderColor="border-[#171717]"
-                title="Lanchi"
-                desc="Empowering Ethiopia's Digital Future."
-              />
-              {/* App 2: Keteme */}
-              <AppMockup
-                mainImg="/keteme1.png"
-                extraImgs={["/keteme2.png", "/keteme3.png", "/keteme4.png", "/keteme5.png"]}
-                bgColor="bg-[#e94f4f]"
-                borderColor="border-[#171717]"
-                title="Keteme"
-                desc="Ethiopia's First Rent-to-Own Furniture Platform."
-                mt="mt-12 md:mt-32"
-              />
-              {/* App 3: Tena Sabi */}
-              <AppMockup
-                mainImg="/tenasabi1.png"
-                extraImgs={["/tenasabi2.png", "/tenasabi3.png", "/tenasabi4.png", "/tenasabi5.png"]}
-                bgColor="bg-[#232323]"
-                borderColor="border-[#171717]"
-                title="Tena Sabi"
-                desc="Your Digital Health Companion."
-              />
-              {/* App 4: IDNET */}
-              <AppMockup
-                mainImg="/idnet1.png"
-                extraImgs={["/idnet2.png", "/idnet3.png", "/idnet4.png", "/idnet5.png"]}
-                bgColor="bg-[#f7b731]"
-                borderColor="border-[#171717]"
-                title="IDNET"
-                desc="Digital Identity Solutions for Ethiopia."
-                mt="mt-12 md:mt-32"
-              />
-            </div>
-          </section>
         </div>
       </section>
 
@@ -522,28 +478,6 @@ export default function Home() {
 
       {/* Footer Section */}
       <footer className="w-full bg-[#F6F6ED] pt-24 pb-8 flex flex-col items-center justify-center border-t border-black/10">
-        <div className="max-w-7xl w-full mx-auto flex flex-col md:flex-row items-start md:items-center justify-between mb-12 px-4 md:px-0">
-          <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-start gap-12">
-            {/* Address */}
-            <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left">
-              <span className="text-xl md:text-2xl font-bold mb-2">OUR ADDRESS</span>
-              <span className="text-lg md:text-xl">Lem-Hotel Area, Addis<br />Ababa</span>
-            </div>
-            {/* Contact */}
-            <div className="flex-1 flex flex-col items-center text-center">
-              <span className="text-xl md:text-2xl font-bold mb-2">CONTACT US</span>
-              <a href="mailto:info@tenadamconsulting.com" className="underline text-lg md:text-xl mb-1">info@tenadamconsulting.com</a>
-              <span className="text-lg md:text-xl">+251-911-58-4260</span>
-              <span className="text-lg md:text-xl">+251-912-44-2502</span>
-              <span className="text-lg md:text-xl">+251-993-51-8990</span>
-            </div>
-            {/* Working Hours */}
-            <div className="flex-1 flex flex-col items-center md:items-end text-center md:text-right">
-              <span className="text-xl md:text-2xl font-bold mb-2">WORKING HOURS</span>
-              <span className="text-lg md:text-xl">Monday – Friday<br />8:30 AM – 5:30 PM</span>
-            </div>
-          </div>
-        </div>
         {/* Bottom: Huge Company Name */}
         <div className="w-full text-center">
           <span className="text-[10vw] md:text-[7vw] font-black uppercase text-black leading-none tracking-tight block">TENADAM<span className="align-super text-3xl md:text-5xl">©</span></span>
